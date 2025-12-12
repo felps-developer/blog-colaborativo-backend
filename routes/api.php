@@ -17,23 +17,23 @@ use Illuminate\Support\Facades\Route;
 
 // Rotas públicas de autenticação
 Route::prefix('auth')->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']);
 });
 
 // Rotas protegidas de autenticação
 Route::middleware('auth:api')->prefix('auth')->group(function () {
-    Route::get('/me', [AuthController::class, 'me']);
+    Route::get('me', [AuthController::class, 'me']);
 });
 
 // Rotas públicas de posts
-Route::get('/posts', [PostsController::class, 'index']);
-Route::get('/posts/{id}', [PostsController::class, 'show']);
+Route::get('posts', [PostsController::class, 'index']);
+Route::get('posts/{id}', [PostsController::class, 'show']);
 
 // Rotas protegidas de posts
 Route::middleware('auth:api')->prefix('posts')->group(function () {
-    Route::post('/', [PostsController::class, 'store']);
-    Route::put('/{id}', [PostsController::class, 'update']);
-    Route::delete('/{id}', [PostsController::class, 'destroy']);
+    Route::post('', [PostsController::class, 'store']);
+    Route::put('{id}', [PostsController::class, 'update']);
+    Route::delete('{id}', [PostsController::class, 'destroy']);
 });
 
