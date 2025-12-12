@@ -15,15 +15,29 @@ class PostResource
      */
     public static function toArray(Post $post): array
     {
+        // Tenta obter o author de diferentes formas
+        try {
+            // Primeiro tenta usar getRelation se a relação estiver definida
+            if ($post->relationLoaded('author') || $post->getRelations()['author'] ?? null) {
+                $author = $post->getRelation('author');
+            } else {
+                // Se não estiver definida, tenta acessar diretamente
+                $author = $post->author;
+            }
+        } catch (\Exception $e) {
+            // Se não conseguir acessar o author, retorna null
+            $author = null;
+        }
+        
         return [
             'id' => $post->id,
             'title' => $post->title,
             'content' => $post->content,
-            'author' => [
-                'id' => $post->author->id,
-                'name' => $post->author->name,
-                'email' => $post->author->email,
-            ],
+            'author' => $author ? [
+                'id' => $author->id,
+                'name' => $author->name,
+                'email' => $author->email,
+            ] : null,
             'created_at' => $post->created_at,
             'updated_at' => $post->updated_at,
         ];
@@ -37,14 +51,28 @@ class PostResource
      */
     public static function toListItem(Post $post): array
     {
+        // Tenta obter o author de diferentes formas
+        try {
+            // Primeiro tenta usar getRelation se a relação estiver definida
+            if ($post->relationLoaded('author') || isset($post->getRelations()['author'])) {
+                $author = $post->getRelation('author');
+            } else {
+                // Se não estiver definida, tenta acessar diretamente
+                $author = $post->author;
+            }
+        } catch (\Exception $e) {
+            // Se não conseguir acessar o author, retorna null
+            $author = null;
+        }
+        
         return [
             'id' => $post->id,
             'title' => $post->title,
-            'author' => [
-                'id' => $post->author->id,
-                'name' => $post->author->name,
-                'email' => $post->author->email,
-            ],
+            'author' => $author ? [
+                'id' => $author->id,
+                'name' => $author->name,
+                'email' => $author->email,
+            ] : null,
             'created_at' => $post->created_at,
             'updated_at' => $post->updated_at,
         ];

@@ -4,6 +4,7 @@ namespace App\Modules\Posts;
 
 use App\Modules\Posts\Contracts\PostsRepositoryInterface;
 use App\Modules\Posts\Policies\PostPolicy;
+use App\Modules\Users\UsersRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
@@ -12,7 +13,8 @@ class PostsService
 {
     public function __construct(
         private PostsRepositoryInterface $postsRepository,
-        private PostPolicy $postPolicy
+        private PostPolicy $postPolicy,
+        private UsersRepository $usersRepository
     ) {}
 
     /**
@@ -115,7 +117,7 @@ class PostsService
                 throw new \Illuminate\Database\Eloquent\ModelNotFoundException("Post com ID {$id} não encontrado");
             }
 
-            $user = \App\Modules\Users\Entities\User::find($userId);
+            $user = $this->usersRepository->findOne($userId);
             if (!$user) {
                 throw new \Illuminate\Database\Eloquent\ModelNotFoundException("Usuário com ID {$userId} não encontrado");
             }
@@ -158,7 +160,7 @@ class PostsService
                 throw new \Illuminate\Database\Eloquent\ModelNotFoundException("Post com ID {$id} não encontrado");
             }
 
-            $user = \App\Modules\Users\Entities\User::find($userId);
+            $user = $this->usersRepository->findOne($userId);
             if (!$user) {
                 throw new \Illuminate\Database\Eloquent\ModelNotFoundException("Usuário com ID {$userId} não encontrado");
             }
