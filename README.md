@@ -180,6 +180,46 @@ A API estará disponível em `http://localhost:8000`
 
 Configure um servidor web (Apache/Nginx) apontando para o diretório `public` do projeto.
 
+## 📖 Documentação da API (Swagger)
+
+O projeto utiliza Swagger/OpenAPI para documentação interativa da API.
+
+### Instalação
+
+Após instalar as dependências do Composer, publique a configuração do Swagger:
+
+```bash
+php artisan vendor:publish --provider "L5Swagger\L5SwaggerServiceProvider"
+```
+
+### Gerar Documentação
+
+Para gerar a documentação Swagger:
+
+```bash
+php artisan l5-swagger:generate
+```
+
+### Acessar Documentação
+
+Após iniciar o servidor (`php artisan serve`), acesse a documentação interativa em:
+
+**URL:** `http://localhost:8000/api/documentation`
+
+A documentação Swagger permite:
+- Visualizar todos os endpoints da API
+- Testar endpoints diretamente na interface
+- Ver exemplos de requisições e respostas
+- Autenticar usando JWT Bearer Token
+
+### Configuração
+
+A configuração do Swagger está em `config/l5-swagger.php`. Você pode personalizar:
+- Título e descrição da API
+- URL do servidor
+- Configurações de segurança (JWT)
+- Opções de UI
+
 ## 📚 Endpoints da API
 
 ### Autenticação

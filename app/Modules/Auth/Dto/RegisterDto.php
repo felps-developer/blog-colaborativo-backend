@@ -5,6 +5,32 @@ namespace App\Modules\Auth\Dto;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
+/**
+ * @OA\Schema(
+ *     schema="RegisterDto",
+ *     required={"name", "email", "password"},
+ *     @OA\Property(
+ *         property="name",
+ *         type="string",
+ *         description="Nome do usuário",
+ *         example="João Silva"
+ *     ),
+ *     @OA\Property(
+ *         property="email",
+ *         type="string",
+ *         format="email",
+ *         description="Email do usuário",
+ *         example="joao@example.com"
+ *     ),
+ *     @OA\Property(
+ *         property="password",
+ *         type="string",
+ *         format="password",
+ *         description="Senha do usuário (mínimo 6 caracteres)",
+ *         example="senha123"
+ *     )
+ * )
+ */
 class RegisterDto extends FormRequest
 {
     /**

@@ -4,6 +4,24 @@ namespace App\Modules\Posts\Dto;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @OA\Schema(
+ *     schema="UpdatePostDto",
+ *     @OA\Property(
+ *         property="title",
+ *         type="string",
+ *         description="Título do post",
+ *         maxLength=255,
+ *         example="Meu Post Atualizado"
+ *     ),
+ *     @OA\Property(
+ *         property="content",
+ *         type="object",
+ *         description="Conteúdo do post em formato JSON (markdown com várias edições)",
+ *         example={"version": "1.1", "content": "# Título Atualizado\n\nConteúdo atualizado..."}
+ *     )
+ * )
+ */
 class UpdatePostDto extends FormRequest
 {
     /**

@@ -4,6 +4,26 @@ namespace App\Modules\Auth\Dto;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @OA\Schema(
+ *     schema="LoginDto",
+ *     required={"email", "password"},
+ *     @OA\Property(
+ *         property="email",
+ *         type="string",
+ *         format="email",
+ *         description="Email do usuário",
+ *         example="joao@example.com"
+ *     ),
+ *     @OA\Property(
+ *         property="password",
+ *         type="string",
+ *         format="password",
+ *         description="Senha do usuário",
+ *         example="senha123"
+ *     )
+ * )
+ */
 class LoginDto extends FormRequest
 {
     /**
