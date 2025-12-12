@@ -34,6 +34,55 @@ Cada módulo contém:
 - **PHPUnit** - Testes unitários
 - **Docker** - Containerização do MySQL
 
+## 📋 Pré-requisitos
+
+Antes de começar, certifique-se de ter instalado:
+
+### 1. PHP 8.2 ou superior
+- **Windows**: Baixe em [php.net/downloads](https://windows.php.net/download/)
+- **Linux**: `sudo apt install php8.2` (Ubuntu/Debian) ou `sudo yum install php82` (CentOS/RHEL)
+- **macOS**: `brew install php@8.2`
+
+Verifique a instalação:
+```bash
+php -v
+```
+
+### 2. Composer
+Gerenciador de dependências do PHP. Se não tiver instalado:
+
+- **Download**: [getcomposer.org/download](https://getcomposer.org/download/)
+- **Windows**: Baixe o instalador `Composer-Setup.exe`
+- **Linux/macOS**: Execute no terminal:
+  ```bash
+  curl -sS https://getcomposer.org/installer | php
+  sudo mv composer.phar /usr/local/bin/composer
+  ```
+
+Verifique a instalação:
+```bash
+composer --version
+```
+
+### 3. Docker e Docker Compose
+Necessário para rodar o MySQL em container. Se não tiver instalado:
+
+- **Docker Desktop (Windows/macOS)**: [docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop/)
+- **Linux**: 
+  ```bash
+  # Ubuntu/Debian
+  sudo apt update
+  sudo apt install docker.io docker-compose
+  sudo systemctl start docker
+  sudo systemctl enable docker
+  ```
+
+Verifique a instalação:
+```bash
+docker --version
+docker-compose --version
+```
+
 ## 📦 Instalação
 
 ### 1. Instalar dependências
@@ -65,12 +114,23 @@ cp .env.example .env
 Configure as variáveis no `.env`:
 
 ```env
+# Aplicação
+APP_NAME="Blog Colaborativo"
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+
+# Banco de Dados
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3307
 DB_DATABASE=blog_colaborativo
 DB_USERNAME=blog_user
 DB_PASSWORD=blog_password
+
+# JWT (será gerado no próximo passo)
+JWT_SECRET=
 ```
 
 ### 4. Gerar chaves
@@ -78,12 +138,20 @@ DB_PASSWORD=blog_password
 ```bash
 php artisan key:generate
 php artisan jwt:secret
+Se perguntar sobre Override key, apenas digita yes
 ```
 
 ### 5. Executar migrations
 
 ```bash
 php artisan migrate
+```
+### Caso de Erro na migrate
+
+```bash
+php artisan config:clear
+
+Depois rode comando da migrate.
 ```
 
 ### 6. Criar usuário de teste (opcional)
