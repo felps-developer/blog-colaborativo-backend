@@ -1,12 +1,13 @@
 # Blog Colaborativo - Backend
 
-Backend da aplicação de blog colaborativo desenvolvido com Laravel 10 e PHP 8.1, seguindo arquitetura modular.
+Backend da aplicação de blog colaborativo desenvolvido com Laravel 10 e PHP 8.2, seguindo arquitetura modular.
 
 ## 📋 Requisitos
 
-- PHP >= 8.1
+- PHP >= 8.2
 - Composer
 - MySQL >= 5.7 ou MariaDB >= 10.3
+- Docker (opcional, mas recomendado para MySQL)
 - Extensões PHP necessárias:
   - OpenSSL
   - PDO
@@ -17,15 +18,82 @@ Backend da aplicação de blog colaborativo desenvolvido com Laravel 10 e PHP 8.
   - JSON
   - BCMath
 
+> **💡 Não tem PHP/Composer instalado?** Veja o guia de instalação em [INSTALACAO.md](./INSTALACAO.md) ou use Docker para instalar dependências (veja abaixo).
+
 ## 🚀 Instalação
 
-### 1. Instale as dependências
+### 0. Instalar PHP e Composer (se necessário)
+
+Se você não tem PHP e Composer instalados, você tem duas opções:
+
+**Opção A: Instalar localmente**
+- Veja o guia completo em [INSTALACAO.md](./INSTALACAO.md)
+- Ou baixe: [PHP](https://windows.php.net/download/) e [Composer](https://getcomposer.org/Composer-Setup.exe)
+
+**Opção B: Usar Docker (rápido)**
+```bash
+# Instalar dependências usando Docker
+docker run --rm -v ${PWD}:/app -w /app composer:latest install
+```
+
+### 1. Configure o PATH (Windows/PowerShell)
+
+Se o Composer não for reconhecido no PowerShell, execute:
+
+```powershell
+.\fix-path.ps1
+```
+
+Ou use o script completo de setup:
+
+```powershell
+.\setup.ps1
+```
+
+> **💡 Problema com PATH?** Veja [SOLUCAO-PATH.md](./SOLUCAO-PATH.md) para soluções permanentes.
+
+### 2. Instale as dependências
 
 ```bash
 composer install
 ```
 
-### 2. Configure o ambiente
+> **Nota:** Certifique-se de ter PHP 8.2+ instalado. Se necessário, use `composer install --ignore-platform-reqs` para ignorar verificações de plataforma.
+
+### 3. Configure o banco de dados com Docker (Recomendado)
+
+**Inicie o MySQL usando Docker:**
+
+```bash
+docker-compose up -d
+```
+
+Isso irá criar um container MySQL com as seguintes credenciais:
+- **Database**: `blog_colaborativo`
+- **User**: `blog_user`
+- **Password**: `blog_password`
+- **Root Password**: `root`
+- **Porta Externa**: `3307` (mapeada para 3306 interno)
+
+**Verifique se o container está rodando:**
+
+```bash
+docker-compose ps
+```
+
+**Aguarde alguns segundos para o MySQL inicializar completamente antes de continuar.**
+
+**Verifique os logs do container (opcional):**
+
+```bash
+docker-compose logs -f mysql
+```
+
+> **💡 Dica:** Se você não tiver Docker instalado ou preferir usar MySQL local, pule este passo e configure as credenciais do seu MySQL local no arquivo `.env`.
+
+> **⚠️ Problema com Porta 3306?** Se você receber um erro dizendo que a porta 3306 já está em uso (provavelmente porque você tem MySQL do XAMPP rodando), o Docker Compose está configurado para usar a porta **3307** externamente. Certifique-se de usar `DB_PORT=3307` no seu arquivo `.env`. Se preferir usar o MySQL do XAMPP diretamente, use `DB_PORT=3306` e as credenciais do seu XAMPP.
+
+### 4. Configure o ambiente
 
 Copie o arquivo `.env.example` para `.env`:
 
@@ -33,37 +101,70 @@ Copie o arquivo `.env.example` para `.env`:
 cp .env.example .env
 ```
 
-Edite o arquivo `.env` e configure as seguintes variáveis:
+**Configure o `.env` com as variáveis necessárias para a API:**
 
 ```env
+# Aplicação
+APP_NAME="Blog Colaborativo"
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+
+# Banco de Dados
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
-DB_PORT=3306
+DB_PORT=3307
 DB_DATABASE=blog_colaborativo
-DB_USERNAME=seu_usuario
-DB_PASSWORD=sua_senha
+DB_USERNAME=blog_user
+DB_PASSWORD=blog_password
 
+# JWT
 JWT_SECRET=
 JWT_TTL=60
 ```
 
-### 3. Gere a chave da aplicação
+> **Nota:** As credenciais acima são para o Docker. Se preferir usar MySQL local, ajuste `DB_USERNAME` e `DB_PASSWORD` conforme sua instalação.
 
+### 5. Gere as chaves necessárias
+
+**Chave da aplicação (APP_KEY):**
 ```bash
 php artisan key:generate
 ```
+Esta chave é usada para criptografar dados sensíveis da aplicação.
 
-### 4. Gere a chave JWT
-
+**Chave JWT (JWT_SECRET):**
 ```bash
 php artisan jwt:secret
 ```
+Esta chave é usada para assinar e verificar tokens JWT de autenticação.
 
-### 5. Execute as migrations
+> **💡 Importante:** Nunca compartilhe essas chaves em repositórios públicos. Elas são geradas automaticamente e adicionadas ao arquivo `.env`.
+
+### 6. Execute as migrations
 
 ```bash
 php artisan migrate
 ```
+
+### 7. Execute o seeder (opcional)
+
+Para criar um usuário de teste, execute:
+
+```bash
+php artisan db:seed
+```
+
+Ou apenas o seeder de usuários:
+
+```bash
+php artisan db:seed --class=UserSeeder
+```
+
+Isso criará um usuário com as seguintes credenciais:
+- **Email**: `teste@example.com`
+- **Senha**: `senha123`
 
 ## 🏃 Como rodar
 
@@ -284,7 +385,19 @@ Authorization: Bearer {token}
 
 ## 🧪 Usuário de Teste
 
-Após executar as migrations, você pode criar um usuário de teste através do endpoint de registro:
+Após executar as migrations, você pode criar um usuário de teste de duas formas:
+
+**Opção 1: Usando o Seeder (Recomendado)**
+
+```bash
+php artisan db:seed --class=UserSeeder
+```
+
+Isso criará um usuário com:
+- **Email**: `teste@example.com`
+- **Senha**: `senha123`
+
+**Opção 2: Através da API**
 
 ```bash
 POST /api/auth/register
@@ -293,12 +406,6 @@ POST /api/auth/register
   "email": "teste@example.com",
   "password": "senha123"
 }
-```
-
-Ou você pode criar um seeder para popular dados de teste:
-
-```bash
-php artisan make:seeder UserSeeder
 ```
 
 ## 🏗️ Arquitetura Modular
@@ -374,6 +481,67 @@ A API utiliza os seguintes códigos de status HTTP:
 - **Laravel 10**: Framework PHP
 - **tymon/jwt-auth**: Autenticação JWT
 - **MySQL**: Banco de dados
+
+## 🐳 Comandos Docker
+
+### Gerenciamento do Container
+
+```bash
+# Iniciar o banco de dados MySQL
+docker-compose up -d
+
+# Parar o banco de dados
+docker-compose down
+
+# Parar e remover volumes (apaga os dados)
+docker-compose down -v
+
+# Reiniciar o container
+docker-compose restart
+
+# Ver status dos containers
+docker-compose ps
+```
+
+### Logs e Monitoramento
+
+```bash
+# Ver logs do MySQL
+docker-compose logs -f mysql
+
+# Ver logs das últimas 100 linhas
+docker-compose logs --tail=100 mysql
+
+# Ver logs em tempo real
+docker-compose logs -f mysql
+```
+
+### Acesso ao Banco de Dados
+
+```bash
+# Acessar o MySQL via terminal
+docker-compose exec mysql mysql -u blog_user -pblog_password blog_colaborativo
+
+# Acessar como root
+docker-compose exec mysql mysql -u root -proot
+
+# Executar comando SQL específico
+docker-compose exec mysql mysql -u blog_user -pblog_password blog_colaborativo -e "SHOW TABLES;"
+```
+
+### Troubleshooting
+
+```bash
+# Verificar se o container está rodando
+docker ps | grep blog_colaborativo_mysql
+
+# Verificar uso de recursos
+docker stats blog_colaborativo_mysql
+
+# Recriar o container do zero
+docker-compose down -v
+docker-compose up -d
+```
 
 ## 🛠️ Comandos Úteis
 

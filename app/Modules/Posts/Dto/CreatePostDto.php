@@ -23,7 +23,7 @@ class CreatePostDto extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'content' => ['required', 'string'],
+            'content' => ['required', 'array'], // JSON para armazenar markdown com várias edições
         ];
     }
 
@@ -39,7 +39,7 @@ class CreatePostDto extends FormRequest
             'title.string' => 'O título deve ser uma string.',
             'title.max' => 'O título não pode ter mais de 255 caracteres.',
             'content.required' => 'O conteúdo é obrigatório.',
-            'content.string' => 'O conteúdo deve ser uma string.',
+            'content.array' => 'O conteúdo deve ser um objeto JSON.',
         ];
     }
 

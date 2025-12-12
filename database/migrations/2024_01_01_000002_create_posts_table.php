@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('title');
-            $table->text('content');
+            $table->json('content'); // JSON para armazenar markdown com várias edições
             $table->uuid('author_id');
-            $table->timestamps();
-            $table->softDeletes();
+            $table->timestamps(); // Cria created_at e updated_at
+            $table->softDeletes(); // Cria deleted_at
 
             $table->foreign('author_id')
                 ->references('id')

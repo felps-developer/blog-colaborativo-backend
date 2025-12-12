@@ -36,6 +36,7 @@ class Post extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'content' => 'array', // Cast para array/JSON
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
