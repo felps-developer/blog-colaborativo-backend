@@ -2,12 +2,14 @@
 
 namespace App\Modules\Posts;
 
+use App\Modules\Posts\Constants\PostConstants;
+use App\Modules\Posts\Contracts\PostsRepositoryInterface;
 use App\Modules\Posts\Entities\Post;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 
-class PostsRepository
+class PostsRepository implements PostsRepositoryInterface
 {
     /**
      * Find a post by ID.
@@ -67,7 +69,7 @@ class PostsRepository
     public function findAll(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
         try {
-            $page = $filters['page'] ?? 1;
+            $page = $filters[PostConstants::PAGINATION_PARAM] ?? PostConstants::DEFAULT_PAGE;
             Log::debug("Buscando posts paginados: página {$page}, limite {$perPage}");
 
             $query = Post::with('author:id,name,email');
@@ -82,7 +84,7 @@ class PostsRepository
 
             $query->orderBy('created_at', 'desc');
 
-            $results = $query->paginate($perPage, ['*'], 'page', $page);
+            $results = $query->paginate($perPage, ['*'], PostConstants::PAGINATION_PARAM, $page);
             Log::debug("Encontrados {$results->total()} posts, {$results->count()} na página atual");
             return $results;
         } catch (\Exception $e) {

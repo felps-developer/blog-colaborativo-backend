@@ -2,7 +2,8 @@
 
 namespace App\Modules\Posts;
 
-use App\Modules\Posts\PostsRepository;
+use App\Modules\Posts\Contracts\PostsRepositoryInterface;
+use App\Modules\Posts\Policies\PostPolicy;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
@@ -10,7 +11,8 @@ use Illuminate\Support\Facades\Log;
 class PostsService
 {
     public function __construct(
-        private PostsRepository $postsRepository
+        private PostsRepositoryInterface $postsRepository,
+        private PostPolicy $postPolicy
     ) {}
 
     /**
@@ -107,8 +109,19 @@ class PostsService
     public function update(string $id, array $data, string $userId): \App\Modules\Posts\Entities\Post
     {
         try {
-            // Verifica se o usuário é o autor do post
-            if (!$this->postsRepository->isAuthor($id, $userId)) {
+            $post = $this->postsRepository->findOne($id);
+            
+            if (!$post) {
+                throw new \Illuminate\Database\Eloquent\ModelNotFoundException("Post com ID {$id} não encontrado");
+            }
+
+            $user = \App\Modules\Users\Entities\User::find($userId);
+            if (!$user) {
+                throw new \Illuminate\Database\Eloquent\ModelNotFoundException("Usuário com ID {$userId} não encontrado");
+            }
+
+            // Verifica permissão usando Policy
+            if (!$this->postPolicy->update($user, $post)) {
                 throw new \Illuminate\Http\Exceptions\HttpResponseException(
                     response()->json(['message' => 'Você não tem permissão para editar este post'], 403)
                 );
@@ -139,8 +152,19 @@ class PostsService
     public function remove(string $id, string $userId): array
     {
         try {
-            // Verifica se o usuário é o autor do post
-            if (!$this->postsRepository->isAuthor($id, $userId)) {
+            $post = $this->postsRepository->findOne($id);
+            
+            if (!$post) {
+                throw new \Illuminate\Database\Eloquent\ModelNotFoundException("Post com ID {$id} não encontrado");
+            }
+
+            $user = \App\Modules\Users\Entities\User::find($userId);
+            if (!$user) {
+                throw new \Illuminate\Database\Eloquent\ModelNotFoundException("Usuário com ID {$userId} não encontrado");
+            }
+
+            // Verifica permissão usando Policy
+            if (!$this->postPolicy->delete($user, $post)) {
                 throw new \Illuminate\Http\Exceptions\HttpResponseException(
                     response()->json(['message' => 'Você não tem permissão para excluir este post'], 403)
                 );

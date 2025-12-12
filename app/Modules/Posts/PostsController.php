@@ -4,6 +4,7 @@ namespace App\Modules\Posts;
 
 use App\Modules\Posts\Dto\CreatePostDto;
 use App\Modules\Posts\Dto\UpdatePostDto;
+use App\Modules\Posts\Resources\PostResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -85,32 +86,11 @@ class PostsController
     {
         try {
             $filters = $request->only(['page', 'title', 'author_id']);
-            $perPage = $request->input('per_page', 10);
+            $perPage = $request->input('per_page', \App\Modules\Posts\Constants\PostConstants::DEFAULT_PER_PAGE);
 
             $posts = $this->postsService->findAll($filters, $perPage);
 
-            // Formata a resposta para mostrar título, autor e data
-            $formattedPosts = $posts->map(function ($post) {
-                return [
-                    'id' => $post->id,
-                    'title' => $post->title,
-                    'author' => [
-                        'id' => $post->author->id,
-                        'name' => $post->author->name,
-                        'email' => $post->author->email,
-                    ],
-                    'created_at' => $post->created_at,
-                    'updated_at' => $post->updated_at,
-                ];
-            });
-
-            return response()->json([
-                'data' => $formattedPosts,
-                'total' => $posts->total(),
-                'page' => $posts->currentPage(),
-                'last_page' => $posts->lastPage(),
-                'per_page' => $posts->perPage(),
-            ], 200);
+            return response()->json(PostResource::paginated($posts), 200);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erro ao listar posts',
@@ -165,18 +145,7 @@ class PostsController
         try {
             $post = $this->postsService->findOne($id);
 
-            return response()->json([
-                'id' => $post->id,
-                'title' => $post->title,
-                'content' => $post->content,
-                'author' => [
-                    'id' => $post->author->id,
-                    'name' => $post->author->name,
-                    'email' => $post->author->email,
-                ],
-                'created_at' => $post->created_at,
-                'updated_at' => $post->updated_at,
-            ], 200);
+            return response()->json(PostResource::toArray($post), 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'Post não encontrado',
@@ -250,18 +219,7 @@ class PostsController
 
             $post = $this->postsService->create($dto->toArray(), $userId);
 
-            return response()->json([
-                'id' => $post->id,
-                'title' => $post->title,
-                'content' => $post->content,
-                'author' => [
-                    'id' => $post->author->id,
-                    'name' => $post->author->name,
-                    'email' => $post->author->email,
-                ],
-                'created_at' => $post->created_at,
-                'updated_at' => $post->updated_at,
-            ], 201);
+            return response()->json(PostResource::toArray($post), 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'message' => 'Erro de validação',
@@ -352,18 +310,7 @@ class PostsController
 
             $post = $this->postsService->update($id, $dto->toArray(), $userId);
 
-            return response()->json([
-                'id' => $post->id,
-                'title' => $post->title,
-                'content' => $post->content,
-                'author' => [
-                    'id' => $post->author->id,
-                    'name' => $post->author->name,
-                    'email' => $post->author->email,
-                ],
-                'created_at' => $post->created_at,
-                'updated_at' => $post->updated_at,
-            ], 200);
+            return response()->json(PostResource::toArray($post), 200);
         } catch (\Illuminate\Http\Exceptions\HttpResponseException $e) {
             return $e->getResponse();
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
