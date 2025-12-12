@@ -114,6 +114,51 @@ Após iniciar o servidor, acesse:
 http://localhost:8000/api/documentation
 ```
 
+## 🧪 Testes
+
+### Testes Aplicados
+
+O projeto utiliza **testes unitários** com PHPUnit e Mockery para isolar e testar componentes individuais:
+
+- **AuthServiceTest**: Testa a lógica de autenticação (registro, login, obtenção de usuário autenticado)
+- **PostsServiceTest**: Testa a lógica de negócio de posts (criação, atualização, exclusão, listagem)
+- **AuthControllerTest**: Testa os endpoints de autenticação
+- **PostsControllerTest**: Testa os endpoints de posts
+
+Os testes utilizam **mocks** para isolar as unidades testadas, não requerendo banco de dados ou conexões externas.
+
+### Como Rodar os Testes
+
+Execute todos os testes:
+
+```bash
+php artisan test
+```
+
+Ou usando PHPUnit diretamente:
+
+```bash
+vendor/bin/phpunit
+```
+
+Para executar apenas testes unitários:
+
+```bash
+php artisan test --testsuite=Unit
+```
+
+Para executar um arquivo de teste específico:
+
+```bash
+php artisan test tests/Unit/AuthServiceTest.php
+```
+
+Para executar um teste específico (método):
+
+```bash
+php artisan test --filter it_can_register_a_new_user
+```
+
 ## 👤 Usuário de Teste
 
 Após executar o seeder, você pode usar:
